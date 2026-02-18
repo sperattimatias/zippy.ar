@@ -1,4 +1,4 @@
-import { Card, Chip, tokens } from '../ui';
+import { Badge, Card, tokens } from '../ui';
 
 const metrics = [
   { label: 'Viajes activos', value: '24', delta: '+6% hoy', status: 'success' as const },
@@ -20,7 +20,7 @@ export default function DashboardPage() {
           <Card key={metric.label} className="space-y-3">
             <p className="text-sm text-zippy-muted">{metric.label}</p>
             <p className="text-3xl font-semibold tracking-tight text-zippy-text">{metric.value}</p>
-            <Chip variant={metric.status}>{metric.delta}</Chip>
+            <Badge variant={metric.status}>{metric.delta}</Badge>
           </Card>
         ))}
       </div>
