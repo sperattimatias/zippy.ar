@@ -3,9 +3,27 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+  --zippy-bg: #060b16;
+  --zippy-surface: #0f1728;
+  --zippy-surface-elevated: #1a2337;
+  --zippy-text: #f6f8ff;
+  --zippy-muted: #9ca8c7;
+  --zippy-border: #2a3550;
+  --zippy-primary: #5b8cff;
+  --zippy-primary-hover: #7ea1ff;
+  --zippy-primary-text: #061028;
+  --zippy-success: #22c55e;
+  --zippy-warning: #f59e0b;
+  --zippy-danger: #f43f5e;
+  --zippy-ring: color-mix(in oklab, var(--zippy-primary), transparent 65%);
+}
+
+* {
+  border-color: var(--zippy-border);
 }
 
 body {
+  font-family: Inter, system-ui, sans-serif;
   @apply bg-zippy-bg text-zippy-text antialiased;
 }
