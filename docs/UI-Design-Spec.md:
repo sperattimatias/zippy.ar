@@ -1,0 +1,159 @@
+# Zippy — UI Design Spec (v1)
+**Producto:** Zippy (Firmat)  
+**Posicionamiento:** Premium · Formal · Movilidad compartida (auto/moto)  
+**Plataformas:** Web pasajero (Next.js), Admin (Next.js), App Conductor (futuro)
+
+---
+
+## 0. Principios
+1) **Menos pasos**: pedir un viaje debe ser más fácil que escribir un WhatsApp.  
+2) **Legibilidad**: tipografía clara, tamaños generosos, alto contraste.  
+3) **Premium**: superficies limpias, espaciado amplio, nada “infantil” ni saturado.  
+4) **Decisiones rápidas**: “Solicitar”, “Aceptar”, “Contraofertar” visibles y obvias.  
+5) **Consistencia**: mismos componentes y tokens en web/admin.
+
+---
+
+## 1. Design Tokens
+> Implementar como CSS variables (globals.css) + Tailwind theme (si aplica)
+
+### Colores (Dark Premium)
+- `--bg`: #0B1220 (fondo general)
+- `--surface`: #111B2E (cards / paneles)
+- `--surface-2`: #0F1A2B (inputs / áreas)
+- `--border`: rgba(255,255,255,0.08)
+- `--text`: #E9EEF7
+- `--text-muted`: #9AA7BD
+- `--primary`: #3EC26F (acción principal)
+- `--info`: #3A86FF
+- `--danger`: #EF4444
+- `--warning`: #F59E0B
+- `--success`: #22C55E
+
+### Tipografía
+- Familia: `Inter` (fallback: system-ui)
+- Pesos: 400 / 500 / 600 / 700
+- Escala:
+  - H1: 28–32 (700)
+  - H2: 22–24 (700)
+  - H3: 18–20 (600)
+  - Body: 14–16 (400/500)
+  - Small: 12–13 (400)
+
+### Espaciado y layout
+- Grid: 12 columnas (web), 4–6 (mobile)
+- Spacing base: 4, 8, 12, 16, 24, 32
+- Card padding: 16–20
+- Radius:
+  - Card: 16–20
+  - Button/Input: 14–16
+- Shadows: suaves, discretas
+
+### Componentes base (tamaños)
+- Botón: alto 48px, padding 16–18px
+- Input: alto 48px
+- Chip: alto 32px
+- Avatar: 40px (list), 56px (detalle)
+- Badge: 22–24px alto
+
+---
+
+## 2. UX Writing (tono)
+**Formal, breve, argentino neutro**
+- CTAs:
+  - “Solicitar viaje”
+  - “Ver ofertas”
+  - “Aceptar”
+  - “Contraofertar”
+  - “Confirmar”
+  - “Cancelar”
+- Estados:
+  - “Buscando conductores…”
+  - “Ofertas disponibles”
+  - “Conductor en camino”
+  - “Conductor llegó”
+  - “Viaje en curso”
+  - “Viaje finalizado”
+- Pagos:
+  - “Pago con Mercado Pago”
+  - “Pago en efectivo”
+- Mensajes de seguridad:
+  - “Conductor verificado”
+  - “Compartir viaje”
+
+---
+
+## 3. IA/Mapas (placeholder)
+En v1 usar placeholder visual:
+- Área mapa: rectángulo con gradiente suave + ícono “map”
+- No integrar mapas reales hasta v2 (para no bloquear desarrollo)
+
+---
+
+## 4. Pantallas (Wireframes UI)
+### 4.1 Web Pasajero — Home (Pedir viaje)
+**Objetivo:** pedir viaje en 20 segundos.
+- Header: Logo Zippy + acceso Perfil/Historial
+- Form:
+  - Origen (placeholder “Tu ubicación”)
+  - Destino
+  - Chips: “Auto”, “Moto”
+  - Chips: “Compartido”, “Directo”
+  - Toggles: “Equipaje”, “Mascota”, “Accesibilidad”
+  - Nota opcional
+- Estimación: “Precio estimado” (rango)
+- CTA: **Solicitar viaje**
+- Link secundario: “Ver historial”
+
+### 4.2 Web Pasajero — Negociación (Ofertas)
+- Top: resumen viaje (origen→destino) + chips + nota
+- Lista de offers (cards):
+  - Avatar + nombre + rating + nivel profesional
+  - Vehículo (auto/moto) + ETA
+  - Precio ofertado
+  - Botones: “Aceptar” (primary) / “Contraofertar” (secondary)
+- Contraoferta: modal con input monto + confirmar
+
+### 4.3 Web Pasajero — Viaje confirmado
+- Card conductor (verificado):
+  - foto, rating, nivel, vehículo, patente (si aplica)
+- Pago: selector “Mercado Pago” / “Efectivo”
+- Mapa placeholder + estado del viaje
+- Acciones: “Chat”, “Compartir viaje”, “Emergencia” (discreto)
+
+### 4.4 Admin — Dashboard
+- KPIs cards:
+  - Viajes activos
+  - Conductores online
+  - Cancelaciones (hoy)
+  - Facturación (hoy)
+- Tabla: viajes recientes (id, estado, tipo, monto, conductor, hora)
+- Filtros: estado / tipo (auto/moto) / pago (MP/efectivo)
+
+### 4.5 Admin — Viajes (listado)
+- Tabla con búsqueda + filtros
+- Drawer detalle (al click):
+  - datos viaje, offers, eventos (audit), pagos
+
+### 4.6 Admin — Conductores (listado)
+- Tabla + estado verificación
+- Drawer detalle:
+  - docs, vehículo, nivel, métricas (puntualidad/cancelaciones/rating)
+
+---
+
+## 5. Reglas visuales para “no genérico”
+1) Nada de “gradientes chillones” ni glassmorphism exagerado.
+2) Mucho padding y aire.
+3) Cards con bordes suaves y divider mínimo.
+4) Iconografía minimal (lucide-react).
+5) Estados y badges discretos, tipografía manda.
+
+---
+
+## 6. Definition of Done UI (v1)
+- 6 pantallas implementadas (web pasajero + admin)
+- Responsive real (mobile-first)
+- Componentes reutilizables (Button, Input, Chip, Card, Badge, Modal)
+- Accesible: focus visible, contraste OK
+- Sin mapas reales (placeholder)
