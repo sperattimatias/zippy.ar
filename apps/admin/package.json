@@ -1,0 +1,11 @@
+{
+  "name": "@zippy/admin",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "lint": "eslint . --max-warnings=0 --no-error-on-unmatched-pattern",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "build": "echo 'No build configured for @zippy/admin yet'",
+    "dev": "echo 'No dev server configured for @zippy/admin yet'"
+  }
+}
