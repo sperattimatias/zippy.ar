@@ -21,3 +21,5 @@ export const Search = (props: IconProps) => <IconBase {...props}><circle cx="11"
 export const Filter = (props: IconProps) => <IconBase {...props}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></IconBase>;
 export const SlidersHorizontal = (props: IconProps) => <IconBase {...props}><line x1="21" x2="14" y1="4" y2="4" /><line x1="10" x2="3" y1="4" y2="4" /><line x1="21" x2="12" y1="12" y2="12" /><line x1="8" x2="3" y1="12" y2="12" /><line x1="21" x2="16" y1="20" y2="20" /><line x1="12" x2="3" y1="20" y2="20" /><line x1="14" x2="14" y1="2" y2="6" /><line x1="8" x2="8" y1="10" y2="14" /><line x1="16" x2="16" y1="18" y2="22" /></IconBase>;
 export const UserCircle = (props: IconProps) => <IconBase {...props}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="10" r="3" /><path d="M7 18c1.5-2 3-3 5-3s3.5 1 5 3" /></IconBase>;
+
+export const Menu = (props: IconProps) => <IconBase {...props}><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="18" y2="18" /></IconBase>;
