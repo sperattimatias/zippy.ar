@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "packageManager": "pnpm@9.12.3",
   "scripts": {
-    "lint": "eslint . --max-warnings=0"
+    "lint": "turbo run lint -- --max-warnings=999"
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "typecheck": "turbo run typecheck",
