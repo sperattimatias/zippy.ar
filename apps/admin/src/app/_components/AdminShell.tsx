@@ -8,7 +8,7 @@ import { Search, UserCircle, X, Menu } from 'lucide-react';
 const navItems = [
   { label: 'Dashboard', href: '/admin' },
   { label: 'Viajes', href: '/admin/rides' },
-  { label: 'Conductores', href: '#' },
+  { label: 'Conductores', href: '/admin/drivers' },
   { label: 'Pagos', href: '#' }
 ];
 
