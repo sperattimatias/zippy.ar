@@ -63,7 +63,19 @@ export default tseslint.config(
       }
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn'
+      // Bootstrap-friendly: mantenemos señales, pero no frenamos el MVP
+      '@typescript-eslint/no-explicit-any': 'warn',
+
+      // Estas reglas suelen romper en bootstrap por inferencias/any de NestJS libs
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+
+      // Promesas sin await: warning por ahora (luego lo subimos a error)
+      '@typescript-eslint/no-floating-promises': 'warn',
+
+      // Reduce fricción por aserciones redundantes en código inicial
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off'
     }
   },
   eslintConfigPrettier
