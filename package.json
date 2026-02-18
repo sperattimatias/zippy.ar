@@ -1,0 +1,32 @@
+{
+  "name": "zippy",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "lint": "turbo run lint",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "typecheck": "turbo run typecheck",
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=@zippy/api",
+    "dev:web": "turbo run dev --filter=@zippy/web",
+    "dev:admin": "turbo run dev --filter=@zippy/admin",
+    "dev:api": "turbo run dev --filter=@zippy/api",
+    "infra:up": "docker compose -f infra/docker-compose.yml --env-file infra/env.example/.env.compose up --build",
+    "infra:down": "docker compose -f infra/docker-compose.yml --env-file infra/env.example/.env.compose down"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.5.1",
+    "turbo": "^2.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0"
+  }
+}
