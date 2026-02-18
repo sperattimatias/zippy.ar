@@ -1,4 +1,4 @@
-import { Card } from '../../ui';
+import { Badge, Table, TableCell, TableHead, TableHeader, TableRow } from '../../ui';
 
 const viajes = [
   { id: 'VJ-1042', pasajero: 'Lucía Fernández', origen: 'Palermo', destino: 'Microcentro', estado: 'En curso' },
@@ -6,6 +6,13 @@ const viajes = [
   { id: 'VJ-1039', pasajero: 'Paula Díaz', origen: 'Caballito', destino: 'Almagro', estado: 'Finalizado' },
   { id: 'VJ-1036', pasajero: 'Diego Rojas', origen: 'Villa Crespo', destino: 'San Telmo', estado: 'Cancelado' }
 ];
+
+const toVariant = (estado: string): 'neutral' | 'success' | 'warning' | 'danger' => {
+  if (estado === 'Finalizado') return 'success';
+  if (estado === 'En curso') return 'warning';
+  if (estado === 'Cancelado') return 'danger';
+  return 'neutral';
+};
 
 export default function ViajesPage() {
   return (
@@ -18,7 +25,7 @@ export default function ViajesPage() {
 
         <label className="flex flex-col gap-2 text-sm font-medium text-zippy-text sm:w-56">
           Estado
-          <select className="h-10 rounded-lg border border-zippy-border bg-white px-3 text-sm text-zippy-text outline-none focus:border-zippy-primary focus:ring-2 focus:ring-zippy-primary/20">
+          <select className="h-10 rounded-xl border border-zippy-border bg-zippy-surface px-3 text-sm text-zippy-text outline-none focus:border-zippy-primary focus:ring-2 focus:ring-zippy-ring">
             <option>Todos</option>
             <option>Asignado</option>
             <option>En curso</option>
@@ -28,30 +35,30 @@ export default function ViajesPage() {
         </label>
       </div>
 
-      <Card className="overflow-x-auto p-0">
-        <table className="min-w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-zippy-border bg-slate-50 text-zippy-muted">
-              <th className="px-4 py-3 font-medium">ID</th>
-              <th className="px-4 py-3 font-medium">Pasajero</th>
-              <th className="px-4 py-3 font-medium">Origen</th>
-              <th className="px-4 py-3 font-medium">Destino</th>
-              <th className="px-4 py-3 font-medium">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {viajes.map((viaje) => (
-              <tr key={viaje.id} className="border-b border-zippy-border last:border-b-0">
-                <td className="px-4 py-3 font-medium text-zippy-text">{viaje.id}</td>
-                <td className="px-4 py-3 text-zippy-text">{viaje.pasajero}</td>
-                <td className="px-4 py-3 text-zippy-text">{viaje.origen}</td>
-                <td className="px-4 py-3 text-zippy-text">{viaje.destino}</td>
-                <td className="px-4 py-3 text-zippy-muted">{viaje.estado}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+      <Table>
+        <TableHead>
+          <TableRow className="border-b-0">
+            <TableHeader>ID</TableHeader>
+            <TableHeader>Pasajero</TableHeader>
+            <TableHeader>Origen</TableHeader>
+            <TableHeader>Destino</TableHeader>
+            <TableHeader>Estado</TableHeader>
+          </TableRow>
+        </TableHead>
+        <tbody>
+          {viajes.map((viaje) => (
+            <TableRow key={viaje.id}>
+              <TableCell className="font-medium">{viaje.id}</TableCell>
+              <TableCell>{viaje.pasajero}</TableCell>
+              <TableCell>{viaje.origen}</TableCell>
+              <TableCell>{viaje.destino}</TableCell>
+              <TableCell>
+                <Badge variant={toVariant(viaje.estado)}>{viaje.estado}</Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </tbody>
+      </Table>
     </section>
   );
 }
