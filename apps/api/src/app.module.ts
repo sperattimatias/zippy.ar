@@ -5,6 +5,7 @@ import { envConfig } from './config/env';
 import { envValidationSchema } from './config/validation';
 import { HealthModule } from './health/health.module';
 import { AppLogger } from './logging/app-logger.service';
+import { RidesModule } from './rides/rides.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AppLogger } from './logging/app-logger.service';
         limit: configService.get<number>('env.throttleLimit', 100)
       }]
     }),
-    HealthModule
+    HealthModule,
+    RidesModule
   ],
   providers: [AppLogger]
 })
