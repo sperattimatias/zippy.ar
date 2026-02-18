@@ -21,3 +21,10 @@ export const Search = (props: IconProps) => <IconBase {...props}><circle cx="11"
 export const Filter = (props: IconProps) => <IconBase {...props}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></IconBase>;
 export const SlidersHorizontal = (props: IconProps) => <IconBase {...props}><line x1="21" x2="14" y1="4" y2="4" /><line x1="10" x2="3" y1="4" y2="4" /><line x1="21" x2="12" y1="12" y2="12" /><line x1="8" x2="3" y1="12" y2="12" /><line x1="21" x2="16" y1="20" y2="20" /><line x1="12" x2="3" y1="20" y2="20" /><line x1="14" x2="14" y1="2" y2="6" /><line x1="8" x2="8" y1="10" y2="14" /><line x1="16" x2="16" y1="18" y2="22" /></IconBase>;
 export const UserCircle = (props: IconProps) => <IconBase {...props}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="10" r="3" /><path d="M7 18c1.5-2 3-3 5-3s3.5 1 5 3" /></IconBase>;
+
+export const Car = (props: IconProps) => <IconBase {...props}><path d="M14 16H9" /><path d="m2 11 2-5a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 5" /><path d="M2 11h20v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-1H7v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" /><circle cx="6.5" cy="13.5" r=".5" fill="currentColor" /><circle cx="17.5" cy="13.5" r=".5" fill="currentColor" /></IconBase>;
+export const Clock3 = (props: IconProps) => <IconBase {...props}><circle cx="12" cy="12" r="10" /><path d="M12 6v6h4" /></IconBase>;
+export const Gauge = (props: IconProps) => <IconBase {...props}><path d="m12 14 4-4" /><path d="M3.34 19a10 10 0 1 1 17.32 0" /></IconBase>;
+export const MessageSquareQuote = (props: IconProps) => <IconBase {...props}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><path d="M8 9h.01" /><path d="M12 9h.01" /></IconBase>;
+export const Star = (props: IconProps) => <IconBase {...props}><path d="m12 3 2.9 5.88 6.5.95-4.7 4.58 1.1 6.49L12 18l-5.8 3.05 1.1-6.49-4.7-4.58 6.5-.95z" /></IconBase>;
+export const Wallet = (props: IconProps) => <IconBase {...props}><path d="M20 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-5" /><path d="M16 12h6v4h-6a2 2 0 1 1 0-4Z" /></IconBase>;
