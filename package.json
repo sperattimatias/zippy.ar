@@ -12,7 +12,9 @@
     "dev": "turbo run dev --filter=@zippy/api",
     "dev:web": "turbo run dev --filter=@zippy/web",
     "dev:admin": "turbo run dev --filter=@zippy/admin",
-    "dev:api": "turbo run dev --filter=@zippy/api"
+    "dev:api": "turbo run dev --filter=@zippy/api",
+    "infra:up": "docker compose -f infra/docker-compose.yml --env-file infra/env.example/.env.compose up --build",
+    "infra:down": "docker compose -f infra/docker-compose.yml --env-file infra/env.example/.env.compose down"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
