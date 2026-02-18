@@ -9,3 +9,5 @@ export { Modal } from './Modal';
 export { Table, TableCell, TableHead, TableHeader, TableRow } from './Table';
 export { Toast } from './Toast';
 export { Skeleton } from './Skeleton';
+
+export { Drawer } from './Drawer';
