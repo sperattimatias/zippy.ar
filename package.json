@@ -9,7 +9,9 @@
     "format:write": "prettier --write .",
     "typecheck": "turbo run typecheck",
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=@zippy/web"
+    "dev": "turbo run dev --filter=@zippy/admin",
+    "dev:web": "turbo run dev --filter=@zippy/web",
+    "dev:admin": "turbo run dev --filter=@zippy/admin"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
