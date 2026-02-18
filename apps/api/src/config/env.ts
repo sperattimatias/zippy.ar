@@ -20,6 +20,7 @@ export const envConfig = registerAs('env', () => {
     port: Number(process.env.PORT ?? 4000),
     allowedOrigins: Array.from(new Set([...directOrigins, ...csvOrigins])),
     throttleTtl: Number(process.env.THROTTLE_TTL ?? 60),
-    throttleLimit: Number(process.env.THROTTLE_LIMIT ?? 100)
+    throttleLimit: Number(process.env.THROTTLE_LIMIT ?? 100),
+    databaseUrl: process.env.DATABASE_URL ?? 'file:./dev.db'
   };
 });
