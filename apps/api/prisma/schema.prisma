@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PASSENGER
+  DRIVER
+  ADMIN
+}
+
+enum RideStatus {
+  REQUESTED
+  NEGOTIATING
+  ASSIGNED
+  DRIVER_EN_ROUTE
+  ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  passwordHash     String
+  role             Role     @default(PASSENGER)
+  refreshTokenHash String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  ridesAsPassenger Ride[] @relation("RidePassenger")
+  ridesAsDriver    Ride[] @relation("RideDriver")
+  offers           Offer[]
+}
+
+model Ride {
+  id                 String     @id @default(cuid())
+  passengerId        String?
+  driverId           String?
+  status             RideStatus @default(REQUESTED)
+  estimatedFare      Decimal    @db.Decimal(10, 2)
+  agreedFare         Decimal?   @db.Decimal(10, 2)
+  hasLuggage         Boolean    @default(false)
+  hasPets            Boolean    @default(false)
+  needsAccessibility Boolean    @default(false)
+  note               String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  passenger User?      @relation("RidePassenger", fields: [passengerId], references: [id])
+  driver    User?      @relation("RideDriver", fields: [driverId], references: [id])
+  offers    Offer[]
+  events    RideEvent[]
+
+  @@index([passengerId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model Offer {
+  id         String   @id @default(cuid())
+  rideId     String
+  driverId   String
+  amount     Decimal  @db.Decimal(10, 2)
+  message    String?
+  isAccepted Boolean  @default(false)
+  acceptedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  ride   Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  driver User @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([rideId])
+  @@index([driverId])
+}
+
+model RideEvent {
+  id         String     @id @default(cuid())
+  rideId     String
+  eventType  String
+  fromStatus RideStatus?
+  toStatus   RideStatus?
+  payload    Json?
+  createdAt  DateTime   @default(now())
+
+  ride Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
+
+  @@index([rideId])
+  @@index([createdAt])
+}
