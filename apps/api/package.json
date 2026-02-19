@@ -10,7 +10,7 @@
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "test": "node --test test/**/*.test.js",
     "seed:dev": "./scripts/seed-dev.sh",
-    "seed:users": "./scripts/seed-auth-users.sh"
+    "db:seed": "./scripts/seed-users.sh"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.11",

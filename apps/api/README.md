@@ -40,21 +40,21 @@ API defaults to `http://localhost:4000` and Swagger docs are at `http://localhos
 In a second terminal (while API is running):
 
 ```bash
-pnpm --filter @zippy/api seed:users
+pnpm --filter @zippy/api db:seed
 ```
 
 Seeded users:
 
-- `admin@zippy.local` / `Admin123!` (ADMIN)
-- `driver@zippy.local` / `Driver123!` (DRIVER)
-- `passenger@zippy.local` / `Passenger123!` (PASSENGER)
+- `admin@zippy.ar` / `Admin123!` (ADMIN)
+- `driver@zippy.ar` / `Driver123!` (DRIVER)
+- `passenger@zippy.ar` / `Passenger123!` (PASSENGER)
 
 ## 6) Login example
 
 ```bash
 curl -X POST http://localhost:4000/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"admin@zippy.local","password":"Admin123!"}'
+  -d '{"email":"admin@zippy.ar","password":"Admin123!"}'
 ```
 
 ## Swagger auth (Bearer)
