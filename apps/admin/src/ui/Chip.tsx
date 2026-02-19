@@ -8,9 +8,9 @@ export function Chip({ selected = false, className = '', children, ...props }: C
   return (
     <button
       type="button"
-      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition ${
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition ${
         selected
-          ? 'border-zippy-primary bg-zippy-primary/20 text-zippy-primary'
+          ? 'border-zippy-primary bg-zippy-primary/10 text-zippy-primary'
           : 'border-zippy-border bg-zippy-surface text-zippy-muted hover:border-zippy-muted hover:text-zippy-text'
       } ${className}`.trim()}
       aria-pressed={selected}

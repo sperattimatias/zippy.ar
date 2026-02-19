@@ -10,29 +10,17 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const baseClasses =
-  'inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zippy-ring disabled:cursor-not-allowed disabled:opacity-60';
+  'inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zippy-ring disabled:cursor-not-allowed disabled:opacity-60';
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-zippy-primary text-zippy-primaryText hover:bg-zippy-primaryHover shadow-soft',
+  primary: 'bg-zippy-primary text-zippy-primaryText hover:bg-zippy-primaryHover',
   secondary: 'border border-zippy-border bg-zippy-surface text-zippy-text hover:bg-zippy-surfaceElevated',
   ghost: 'bg-transparent text-zippy-text hover:bg-zippy-surfaceElevated'
 };
 
-export function Button({
-  variant = 'primary',
-  leadingIcon,
-  loading = false,
-  className = '',
-  children,
-  disabled,
-  ...props
-}: ButtonProps) {
+export function Button({ variant = 'primary', leadingIcon, loading = false, className = '', children, disabled, ...props }: ButtonProps) {
   return (
-    <button
-      className={`${baseClasses} ${variants[variant]} ${className}`.trim()}
-      disabled={disabled || loading}
-      {...props}
-    >
+    <button className={`${baseClasses} ${variants[variant]} ${className}`.trim()} disabled={disabled || loading} {...props}>
       {loading ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : leadingIcon}
       {children}
     </button>

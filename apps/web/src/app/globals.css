@@ -3,20 +3,20 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
-  --zippy-bg: #060b16;
-  --zippy-surface: #0f1728;
-  --zippy-surface-elevated: #1a2337;
-  --zippy-text: #f6f8ff;
-  --zippy-muted: #9ca8c7;
-  --zippy-border: #2a3550;
-  --zippy-primary: #5b8cff;
-  --zippy-primary-hover: #7ea1ff;
-  --zippy-primary-text: #061028;
-  --zippy-success: #22c55e;
-  --zippy-warning: #f59e0b;
-  --zippy-danger: #f43f5e;
-  --zippy-ring: color-mix(in oklab, var(--zippy-primary), transparent 65%);
+  color-scheme: light;
+  --zippy-bg: #f7f8fa;
+  --zippy-surface: #ffffff;
+  --zippy-surface-elevated: #f9fafb;
+  --zippy-text: #111827;
+  --zippy-muted: #6b7280;
+  --zippy-border: #e5e7eb;
+  --zippy-primary: #2563eb;
+  --zippy-primary-hover: #1d4ed8;
+  --zippy-primary-text: #ffffff;
+  --zippy-success: #059669;
+  --zippy-warning: #d97706;
+  --zippy-danger: #dc2626;
+  --zippy-ring: color-mix(in oklab, var(--zippy-primary), transparent 72%);
 }
 
 * {

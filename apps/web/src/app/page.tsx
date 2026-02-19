@@ -55,7 +55,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(120%_120%_at_50%_-10%,rgba(126,161,255,0.18)_0%,rgba(6,11,22,0.95)_45%,rgba(6,11,22,1)_100%)]">
+    <main className="min-h-screen bg-zippy-bg">
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 pb-5 pt-6 sm:px-6">
         <span className="text-xl font-semibold tracking-tight text-zippy-text">Zippy</span>
 
@@ -110,7 +110,7 @@ export default function HomePage() {
                   }}
                   aria-invalid={Boolean(destinationError)}
                 />
-                {destinationError ? <p className="text-sm text-rose-300">{destinationError}</p> : null}
+                {destinationError ? <p className="text-sm text-rose-600">{destinationError}</p> : null}
               </div>
             </div>
 
@@ -166,7 +166,7 @@ export default function HomePage() {
               />
             </label>
 
-            <Card className="space-y-1 rounded-2xl border-zippy-primary/40 bg-zippy-primary/10 p-4">
+            <Card className="space-y-1 rounded-2xl border-zippy-border bg-zippy-surfaceElevated p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zippy-muted">Estimado del viaje</p>
               <p className="text-2xl font-semibold tracking-tight text-zippy-text">
                 ARS ${estimatedRange.min.toLocaleString('es-AR')} - ${estimatedRange.max.toLocaleString('es-AR')}

@@ -72,7 +72,7 @@ export function ConfirmedClient({ data }: { data: ConfirmedData }) {
             <p className="mt-1 text-sm font-medium text-zippy-text">{data.vehicleType} · Patente AC 483 ZP</p>
           </div>
 
-          <div className="rounded-xl border border-zippy-primary/30 bg-zippy-primary/10 p-3">
+          <div className="rounded-xl border border-zippy-border bg-zippy-surfaceElevated p-3">
             <p className="text-xs uppercase tracking-wide text-zippy-muted">Precio acordado</p>
             <p className="mt-1 text-2xl font-semibold text-zippy-text">{data.price}</p>
           </div>
@@ -110,7 +110,7 @@ export function ConfirmedClient({ data }: { data: ConfirmedData }) {
           {timeline.map((item) => (
             <li key={item.label} className="flex gap-3">
               <span
-                className={`mt-1 inline-flex size-3 rounded-full ${item.active ? 'bg-zippy-primary shadow-[0_0_0_4px_rgba(91,140,255,0.2)]' : 'bg-zippy-border'}`}
+                className={`mt-1 inline-flex size-3 rounded-full ${item.active ? 'bg-zippy-primary shadow-[0_0_0_4px_rgba(37,99,235,0.12)]' : 'bg-zippy-border'}`}
               />
               <div>
                 <p className={`text-sm font-medium ${item.active ? 'text-zippy-text' : 'text-zippy-muted'}`}>{item.label}</p>
@@ -128,7 +128,7 @@ export function ConfirmedClient({ data }: { data: ConfirmedData }) {
         <Button variant="secondary" leadingIcon={<Navigation className="size-4" />}>
           Compartir viaje
         </Button>
-        <Button variant="ghost" leadingIcon={<Bell className="size-4" />} className="border border-rose-500/30 text-rose-300 hover:bg-rose-500/10">
+        <Button variant="ghost" leadingIcon={<Bell className="size-4" />} className="border border-rose-500/30 text-rose-600 hover:bg-rose-500/10">
           Emergencia
         </Button>
       </div>

@@ -156,7 +156,7 @@ export default function AdminRidesPage() {
         </TableHead>
         <tbody>
           {filtered.map((ride) => (
-            <TableRow key={ride.id} className="cursor-pointer hover:bg-zippy-surfaceElevated/40" onClick={() => setSelectedRide(ride)}>
+            <TableRow key={ride.id} className="cursor-pointer hover:bg-zippy-surfaceElevated/60" onClick={() => setSelectedRide(ride)}>
               <TableCell className="font-medium">{ride.id}</TableCell>
               <TableCell>{ride.passenger}</TableCell>
               <TableCell>{ride.origin}</TableCell>
@@ -200,7 +200,7 @@ export default function AdminRidesPage() {
               <p className="text-sm text-zippy-muted">Events / Audit timeline</p>
               <ol className="space-y-2">
                 {selectedRide.events.map((event) => (
-                  <li key={`${selectedRide.id}-${event.at}-${event.label}`} className="rounded-lg border border-zippy-border bg-zippy-surfaceElevated/40 p-3">
+                  <li key={`${selectedRide.id}-${event.at}-${event.label}`} className="rounded-lg border border-zippy-border bg-zippy-surfaceElevated/60 p-3">
                     <p className="text-xs text-zippy-muted">{event.at} · {event.label}</p>
                     <p className="text-sm text-zippy-text">{event.detail}</p>
                   </li>

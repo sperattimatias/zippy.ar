@@ -113,7 +113,7 @@ export function OffersClient({ query }: { query: Query }) {
         <h1 className="text-2xl font-semibold tracking-tight text-zippy-text sm:text-3xl">Elegí tu mejor opción</h1>
       </div>
 
-      <Card className="space-y-4 rounded-3xl p-5 sm:p-6">
+      <Card className="space-y-4 rounded-2xl p-5 sm:p-6">
         <div className="space-y-2">
           <p className="text-sm font-medium text-zippy-muted">Resumen del viaje</p>
           <p className="text-lg font-semibold text-zippy-text">{query.origin} <span className="text-zippy-muted">→</span> {query.destination}</p>
@@ -135,7 +135,7 @@ export function OffersClient({ query }: { query: Query }) {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {offersMock.map((offer) => (
-          <Card key={offer.id} className="space-y-4 rounded-3xl p-5">
+          <Card key={offer.id} className="space-y-4 rounded-2xl p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-zippy-surfaceElevated text-sm font-semibold text-zippy-text">{offer.avatar}</div>
@@ -158,7 +158,7 @@ export function OffersClient({ query }: { query: Query }) {
               </div>
             </div>
 
-            <div className="rounded-xl border border-zippy-primary/30 bg-zippy-primary/10 p-3">
+            <div className="rounded-xl border border-zippy-border bg-zippy-surfaceElevated p-3">
               <p className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-zippy-muted"><Wallet className="size-3.5" /> Oferta</p>
               <p className="mt-1 text-2xl font-semibold tracking-tight text-zippy-text">{formatArs(offer.offeredPrice)}</p>
             </div>
@@ -189,7 +189,7 @@ export function OffersClient({ query }: { query: Query }) {
             }}
             min={1}
           />
-          {counterError ? <p className="text-sm text-rose-300">{counterError}</p> : null}
+          {counterError ? <p className="text-sm text-rose-600">{counterError}</p> : null}
           <div className="flex justify-end gap-2">
             <Button variant="ghost" className="w-auto" onClick={() => setCounterOfferOpen(false)}>Cancelar</Button>
             <Button className="w-auto" onClick={submitCounterOffer}>Confirmar</Button>

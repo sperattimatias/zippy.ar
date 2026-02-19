@@ -156,7 +156,7 @@ export default function AdminDriversPage() {
           {filteredDrivers.map((driver) => (
             <TableRow
               key={driver.id}
-              className="cursor-pointer hover:bg-zippy-surfaceElevated/40"
+              className="cursor-pointer hover:bg-zippy-surfaceElevated/60"
               onClick={() => openDriver(driver)}
             >
               <TableCell className="font-medium">{driver.id}</TableCell>
@@ -218,7 +218,7 @@ export default function AdminDriversPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <Button onClick={() => setCurrentStatus('Verificado')}>Verificar</Button>
-              <Button variant="ghost" className="border border-rose-500/30 text-rose-300 hover:bg-rose-500/10" onClick={() => setCurrentStatus('Suspendido')}>
+              <Button variant="ghost" className="border border-rose-500/30 text-rose-600 hover:bg-rose-500/10" onClick={() => setCurrentStatus('Suspendido')}>
                 Suspender
               </Button>
             </div>
