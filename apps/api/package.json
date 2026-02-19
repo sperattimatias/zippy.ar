@@ -7,7 +7,9 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "lint": "eslint src --max-warnings=999",
-    "typecheck": "tsc --project tsconfig.json --noEmit"
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "test": "node --test test/**/*.test.js",
+    "seed:dev": "./scripts/seed-dev.sh"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.11",
