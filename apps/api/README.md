@@ -37,7 +37,9 @@ API defaults to `http://localhost:4000` and Swagger docs are at `http://localhos
 
 ## 5) Seed auth users (ADMIN / DRIVER / PASSENGER)
 
-In a second terminal (while API is running):
+This seed is cross-platform (Windows/macOS/Linux) and uses Prisma + bcrypt.
+
+From repository root:
 
 ```bash
 pnpm --filter @zippy/api db:seed
@@ -55,6 +57,12 @@ Seeded users:
 curl -X POST http://localhost:4000/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@zippy.ar","password":"Admin123!"}'
+```
+
+Windows PowerShell works with the same command:
+
+```powershell
+pnpm --filter @zippy/api db:seed
 ```
 
 ## Swagger auth (Bearer)
