@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AuthModule } from './auth/auth.module';
 import { envConfig } from './config/env';
 import { envValidationSchema } from './config/validation';
 import { HealthModule } from './health/health.module';
@@ -25,6 +26,7 @@ import { RidesModule } from './rides/rides.module';
       }]
     }),
     HealthModule,
+    AuthModule,
     RidesModule
   ],
   providers: [AppLogger]
