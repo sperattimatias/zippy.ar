@@ -16,8 +16,8 @@ export function Modal({ open, title, description, onClose, children }: ModalProp
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-lg rounded-2xl border border-zippy-border bg-zippy-surface p-6 shadow-modal">
+    <div className="fixed inset-0 z-40 flex items-end bg-black/30 p-0 sm:items-center sm:justify-center sm:p-4" onClick={onClose} role="presentation">
+      <div className="w-full rounded-t-2xl border border-zippy-border bg-zippy-surface p-5 shadow-modal sm:max-w-lg sm:rounded-2xl" onClick={(e)=>e.stopPropagation()}>
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="space-y-1">
             <h2 className="text-lg font-semibold text-zippy-text">{title}</h2>
@@ -28,10 +28,8 @@ export function Modal({ open, title, description, onClose, children }: ModalProp
           </button>
         </div>
         {children ? <div>{children}</div> : null}
-        <div className="mt-6 flex justify-end">
-          <Button variant="secondary" className="w-auto" onClick={onClose}>
-            Cerrar
-          </Button>
+        <div className="mt-5 flex justify-end">
+          <Button variant="secondary" className="w-auto" onClick={onClose}>Cerrar</Button>
         </div>
       </div>
     </div>

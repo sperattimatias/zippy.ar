@@ -13,20 +13,24 @@ export default function WebUiPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-6 py-8 md:px-8">
       <h1 className="text-3xl font-semibold tracking-tight">UI Foundation · Web</h1>
 
-      <Card className="grid gap-3 sm:grid-cols-3">
-        <Button leadingIcon={<Bell className="size-4" />}>Primario</Button>
-        <Button variant="secondary">Secundario</Button>
-        <Button variant="ghost" loading>
-          Cargando
-        </Button>
+      <Card className="space-y-3">
+        <p className="text-sm font-medium text-zippy-muted">Buttons states</p>
+        <div className="grid gap-3 sm:grid-cols-5">
+          <Button leadingIcon={<Bell className="size-4" />}>Default</Button>
+          <Button variant="secondary" className="hover:bg-zippy-surfaceElevated">Hover</Button>
+          <Button className="ring-2 ring-zippy-ring">Focus</Button>
+          <Button disabled>Disabled</Button>
+          <Button loading>Loading</Button>
+        </div>
       </Card>
 
       <Card className="grid gap-4 md:grid-cols-2">
         <Input label="Buscar dirección" placeholder="Palermo, CABA" leftIcon={<Search className="size-4" />} />
-        <Input label="Salida" placeholder="Hoy 18:40" leftIcon={<CalendarClock className="size-4" />} />
+        <Input label="Salida" placeholder="Hoy 18:40" leftIcon={<CalendarClock className="size-4" />} className="ring-2 ring-zippy-ring" />
       </Card>
 
       <Card className="space-y-4">
+        <p className="text-sm font-medium text-zippy-muted">Segmented / Chip + Badge</p>
         <div className="flex flex-wrap gap-2">
           {['económico', 'premium', 'mascotas'].map((item) => (
             <Chip key={item} selected={chip === item} onClick={() => setChip(item)}>
@@ -47,7 +51,7 @@ export default function WebUiPage() {
 
       <Card className="flex flex-wrap items-center gap-3">
         <Button variant="secondary" leadingIcon={<MapPin className="size-4" />} onClick={() => setOpen(true)}>
-          Abrir modal
+          Abrir sheet
         </Button>
       </Card>
 
