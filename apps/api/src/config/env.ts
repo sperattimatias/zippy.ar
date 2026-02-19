@@ -21,7 +21,7 @@ export const envConfig = registerAs('env', () => {
     allowedOrigins: Array.from(new Set([...directOrigins, ...csvOrigins])),
     throttleTtl: Number(process.env.THROTTLE_TTL ?? 60),
     throttleLimit: Number(process.env.THROTTLE_LIMIT ?? 100),
-    databaseUrl: process.env.DATABASE_URL ?? 'file:./dev.db',
+    databaseUrl: process.env.DATABASE_URL ?? 'postgresql://zippy:zippy@localhost:5432/zippy',
     jwtAccessSecret: process.env.JWT_ACCESS_SECRET ?? 'dev-access-secret',
     jwtRefreshSecret: process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret',
     jwtAccessExpiresInSeconds: Number(process.env.JWT_ACCESS_EXPIRES_IN_SECONDS ?? 900),

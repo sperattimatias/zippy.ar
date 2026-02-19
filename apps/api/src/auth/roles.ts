@@ -1,5 +1,4 @@
-export enum UserRole {
-  PASSENGER = 'PASSENGER',
-  DRIVER = 'DRIVER',
-  ADMIN = 'ADMIN'
-}
+import { Role } from '@prisma/client';
+
+export const UserRole = Role;
+export type UserRole = Role;

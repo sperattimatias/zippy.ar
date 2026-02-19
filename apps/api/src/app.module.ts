@@ -6,6 +6,7 @@ import { envConfig } from './config/env';
 import { envValidationSchema } from './config/validation';
 import { HealthModule } from './health/health.module';
 import { AppLogger } from './logging/app-logger.service';
+import { PrismaModule } from './prisma/prisma.module';
 import { RidesModule } from './rides/rides.module';
 
 @Module({
@@ -25,6 +26,7 @@ import { RidesModule } from './rides/rides.module';
         limit: configService.get<number>('env.throttleLimit', 100)
       }]
     }),
+    PrismaModule,
     HealthModule,
     AuthModule,
     RidesModule

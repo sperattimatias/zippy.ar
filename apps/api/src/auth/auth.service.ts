@@ -1,19 +1,12 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID, createHash } from 'node:crypto';
+import { Role, User } from '@prisma/client';
+import { createHash } from 'node:crypto';
+import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { hashPassword, verifyPassword } from './password';
-import { UserRole } from './roles';
 import { signJwt, verifyJwt } from './jwt';
-
-type UserRecord = {
-  id: string;
-  email: string;
-  passwordHash: string;
-  role: UserRole;
-  refreshTokenHash?: string;
-};
+import { hashPassword, verifyPassword } from './password';
 
 type TokenPair = {
   accessToken: string;
@@ -21,50 +14,55 @@ type TokenPair = {
   expiresIn: number;
 };
 
-const usersByEmail = new Map<string, UserRecord>();
-const usersById = new Map<string, UserRecord>();
-
 @Injectable()
 export class AuthService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prisma: PrismaService
+  ) {}
 
-  register(dto: RegisterDto) {
+  async register(dto: RegisterDto) {
     const email = dto.email.toLowerCase().trim();
-    if (usersByEmail.has(email)) {
+    const existing = await this.prisma.user.findUnique({ where: { email } });
+
+    if (existing) {
       throw new ConflictException('Email is already registered');
     }
 
-    const user: UserRecord = {
-      id: randomUUID(),
-      email,
-      passwordHash: hashPassword(dto.password),
-      role: dto.role ?? UserRole.PASSENGER
-    };
-
-    usersByEmail.set(email, user);
-    usersById.set(user.id, user);
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        passwordHash: await hashPassword(dto.password),
+        role: dto.role ?? Role.PASSENGER
+      }
+    });
 
     return this.createAuthResponse(user);
   }
 
-  login(dto: LoginDto) {
-    const user = usersByEmail.get(dto.email.toLowerCase().trim());
-    if (!user || !verifyPassword(dto.password, user.passwordHash)) {
+  async login(dto: LoginDto) {
+    const email = dto.email.toLowerCase().trim();
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user || !(await verifyPassword(dto.password, user.passwordHash))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     return this.createAuthResponse(user);
   }
 
-  refresh(refreshToken: string) {
+  async refresh(refreshToken: string) {
     let payload: { sub: string; exp: number };
     try {
-      payload = verifyJwt(refreshToken, this.configService.getOrThrow<string>('env.jwtRefreshSecret')) as { sub: string; exp: number };
+      payload = verifyJwt(refreshToken, this.configService.getOrThrow<string>('env.jwtRefreshSecret')) as {
+        sub: string;
+        exp: number;
+      };
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const user = usersById.get(payload.sub);
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
     const incomingHash = createHash('sha256').update(refreshToken).digest('hex');
 
     if (!user?.refreshTokenHash || user.refreshTokenHash !== incomingHash) {
@@ -74,9 +72,24 @@ export class AuthService {
     return this.createAuthResponse(user);
   }
 
-  private createAuthResponse(user: UserRecord) {
+  async logout(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshTokenHash: null }
+    });
+
+    return { success: true };
+  }
+
+  private async createAuthResponse(user: User) {
     const tokens = this.issueTokens(user);
-    user.refreshTokenHash = createHash('sha256').update(tokens.refreshToken).digest('hex');
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        refreshTokenHash: createHash('sha256').update(tokens.refreshToken).digest('hex')
+      }
+    });
 
     return {
       accessToken: tokens.accessToken,
@@ -91,7 +104,7 @@ export class AuthService {
     };
   }
 
-  private issueTokens(user: UserRecord): TokenPair {
+  private issueTokens(user: User): TokenPair {
     const expiresIn = Number(this.configService.get<number>('env.jwtAccessExpiresInSeconds', 900));
     const refreshExpiresIn = Number(this.configService.get<number>('env.jwtRefreshExpiresInSeconds', 604800));
 

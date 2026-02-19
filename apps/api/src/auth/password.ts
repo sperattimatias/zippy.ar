@@ -1,14 +1,8 @@
-import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
+import bcrypt from 'bcrypt';
 
-export const hashPassword = (password: string): string => {
-  const salt = randomBytes(16).toString('hex');
-  const hash = scryptSync(password, salt, 64).toString('hex');
-  return `${salt}:${hash}`;
-};
+const PASSWORD_SALT_ROUNDS = 12;
 
-export const verifyPassword = (password: string, storedHash: string): boolean => {
-  const [salt, originalHash] = storedHash.split(':');
-  if (!salt || !originalHash) return false;
-  const hash = scryptSync(password, salt, 64).toString('hex');
-  return timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(originalHash, 'hex'));
-};
+export const hashPassword = (password: string): Promise<string> => bcrypt.hash(password, PASSWORD_SALT_ROUNDS);
+
+export const verifyPassword = (password: string, storedHash: string): Promise<boolean> =>
+  bcrypt.compare(password, storedHash);

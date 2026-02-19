@@ -16,7 +16,11 @@ async function bootstrap() {
   app.useLogger(logger);
 
   const configService = app.get(ConfigService);
-  const allowedOrigins = configService.get<string[]>('env.allowedOrigins', []);
+  const configuredOrigins = configService.get<string[]>('env.allowedOrigins', []);
+  const isDevelopment = configService.get<string>('env.nodeEnv', 'development') === 'development';
+  const allowedOrigins = isDevelopment
+    ? Array.from(new Set([...configuredOrigins, 'http://localhost:3000', 'http://localhost:3001']))
+    : configuredOrigins;
 
   app.use(helmet());
   app.enableCors({
