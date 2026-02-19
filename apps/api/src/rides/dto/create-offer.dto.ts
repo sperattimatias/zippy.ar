@@ -3,10 +3,6 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 export class CreateOfferDto {
-  @ApiProperty({ example: 'driver_123' })
-  @IsString()
-  driverId!: string;
-
   @ApiProperty({ example: 2300 })
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })

@@ -46,10 +46,11 @@ export class RidesService {
   private readonly offers = new Map<string, Offer>();
   private readonly events = new Map<string, RideEvent[]>();
 
-  createRide(dto: CreateRideDto) {
+  createRide(passengerId: string, dto: CreateRideDto) {
     const now = new Date().toISOString();
     const ride: Ride = {
       id: randomUUID(),
+      passengerId,
       status: RideStatus.REQUESTED,
       estimatedFare: dto.estimatedFare,
       hasLuggage: dto.hasLuggage ?? false,
@@ -64,7 +65,7 @@ export class RidesService {
 
     this.createEvent(ride.id, 'ride.created', {
       toStatus: RideStatus.REQUESTED,
-      payload: { estimatedFare: dto.estimatedFare }
+      payload: { estimatedFare: dto.estimatedFare, passengerId }
     });
 
     return this.getRideView(ride.id);
@@ -76,7 +77,7 @@ export class RidesService {
       .map((ride) => this.getRideView(ride.id));
   }
 
-  createOffer(rideId: string, dto: CreateOfferDto) {
+  createOffer(rideId: string, driverId: string, dto: CreateOfferDto) {
     const ride = this.findRideOrThrow(rideId);
 
     if ([RideStatus.COMPLETED, RideStatus.CANCELLED, RideStatus.EXPIRED].includes(ride.status)) {
@@ -86,7 +87,7 @@ export class RidesService {
     const offer: Offer = {
       id: randomUUID(),
       rideId,
-      driverId: dto.driverId,
+      driverId,
       amount: dto.amount,
       message: dto.message,
       createdAt: new Date().toISOString()
