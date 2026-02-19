@@ -3,6 +3,8 @@ services:
     image: postgres:16-alpine
     container_name: zippy-postgres
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-zippy}
       POSTGRES_USER: ${POSTGRES_USER:-zippy}
@@ -33,16 +35,18 @@ services:
       - '${REDIS_PORT:-6379}:6379'
 
   api:
-    image: node:22-alpine
+    build:
+      context: ..
+      dockerfile: infra/docker/api.Dockerfile
     container_name: zippy-api
     restart: unless-stopped
-    working_dir: /workspace
-    command: >
-      sh -c "corepack enable &&
-      pnpm install --frozen-lockfile=false &&
-      pnpm --filter @zippy/api dev"
+    command: pnpm --filter @zippy/api dev
+    env_file:
+      - ./.env
     environment:
+      CI: '1'
       NODE_ENV: development
+      HOST: 0.0.0.0
       PORT: 4000
       WEB_ORIGIN: http://localhost
       ADMIN_ORIGIN: http://localhost/admin
@@ -51,8 +55,8 @@ services:
       THROTTLE_LIMIT: 100
       DATABASE_URL: postgresql://${POSTGRES_USER:-zippy}:${POSTGRES_PASSWORD:-zippy}@postgres:5432/${POSTGRES_DB:-zippy}
       REDIS_URL: redis://redis:6379
-    volumes:
-      - ..:/workspace
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
     depends_on:
       postgres:
         condition: service_healthy
@@ -62,19 +66,17 @@ services:
       - '4000'
 
   web:
-    image: node:22-alpine
+    build:
+      context: ..
+      dockerfile: infra/docker/web.Dockerfile
     container_name: zippy-web
     restart: unless-stopped
-    working_dir: /workspace
-    command: >
-      sh -c "corepack enable &&
-      pnpm install --frozen-lockfile=false &&
-      pnpm --filter @zippy/web dev -- --hostname 0.0.0.0 --port 3000"
+    command: pnpm --filter @zippy/web dev -- --hostname 0.0.0.0 --port 3000
     environment:
+      CI: '1'
       NODE_ENV: development
       PORT: 3000
-    volumes:
-      - ..:/workspace
+      NEXT_PUBLIC_API_URL: http://localhost/api
     depends_on:
       api:
         condition: service_started
@@ -82,19 +84,17 @@ services:
       - '3000'
 
   admin:
-    image: node:22-alpine
+    build:
+      context: ..
+      dockerfile: infra/docker/admin.Dockerfile
     container_name: zippy-admin
     restart: unless-stopped
-    working_dir: /workspace
-    command: >
-      sh -c "corepack enable &&
-      pnpm install --frozen-lockfile=false &&
-      pnpm --filter @zippy/admin dev -- --hostname 0.0.0.0 --port 3001"
+    command: pnpm --filter @zippy/admin dev -- --hostname 0.0.0.0 --port 3001
     environment:
+      CI: '1'
       NODE_ENV: development
       PORT: 3001
-    volumes:
-      - ..:/workspace
+      NEXT_PUBLIC_API_URL: http://localhost/api
     depends_on:
       api:
         condition: service_started
