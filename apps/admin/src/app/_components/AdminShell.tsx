@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Search, UserCircle, X, Menu } from 'lucide-react';
+import { clearStoredAuth, getStoredAuth } from '../../lib/api-client';
 
 const navItems = [
   { label: 'Dashboard', href: '/admin' },
@@ -14,7 +15,41 @@ const navItems = [
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const isLoginRoute = pathname === '/admin/login';
+    const auth = getStoredAuth();
+    const isAdmin = auth?.role === 'ADMIN';
+
+    if (isLoginRoute) {
+      if (isAdmin) {
+        router.replace('/admin');
+        return;
+      }
+
+      setIsReady(true);
+      return;
+    }
+
+    if (!isAdmin) {
+      clearStoredAuth();
+      router.replace('/admin/login');
+      return;
+    }
+
+    setIsReady(true);
+  }, [pathname, router]);
+
+  if (!isReady) {
+    return <div className="min-h-screen bg-zippy-bg" />;
+  }
+
+  if (pathname === '/admin/login') {
+    return <div className="min-h-screen bg-zippy-bg">{children}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-zippy-bg md:grid md:grid-cols-[260px_1fr]">
