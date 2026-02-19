@@ -24,6 +24,11 @@ Pegá esos valores en `infra/.env` para:
 docker compose -f infra/docker-compose.yml up -d --build
 ```
 
+
+## Nota sobre lockfile en alpha
+
+Las imágenes Docker de alpha usan `pnpm install --no-frozen-lockfile` durante el build para priorizar que el stack levante en VPS nuevos aunque el `pnpm-lock.yaml` esté desactualizado respecto a algún `package.json`.
+
 ## 4) Verificaciones
 
 ### Nginx -> API

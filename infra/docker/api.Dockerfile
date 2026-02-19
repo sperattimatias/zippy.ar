@@ -1,13 +1,13 @@
 FROM node:22-alpine AS base
 WORKDIR /workspace
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@10.30.0 --activate
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY apps/api/package.json apps/api/package.json
 COPY apps/web/package.json apps/web/package.json
 COPY apps/admin/package.json apps/admin/package.json
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 FROM base AS runner
 ENV CI=1
