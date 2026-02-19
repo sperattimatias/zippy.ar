@@ -48,6 +48,15 @@ async function bootstrap() {
     .setTitle('Zippy API')
     .setDescription('Documentación técnica de la API de Zippy.')
     .setVersion('1.0.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Access token'
+      },
+      'bearer'
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
@@ -62,4 +71,4 @@ async function bootstrap() {
   });
 }
 
-bootstrap();
+void bootstrap();

@@ -6,16 +6,19 @@ const config: Config = {
     extend: {
       colors: {
         zippy: {
-          bg: '#F7F9FC',
-          surface: '#FFFFFF',
-          text: '#111827',
-          muted: '#667085',
-          border: '#E4E7EC',
-          primary: '#0D6EFD',
-          primaryHover: '#0B5ED7',
-          success: '#12B76A',
-          warning: '#F79009',
-          danger: '#F04438'
+          bg: 'var(--zippy-bg)',
+          surface: 'var(--zippy-surface)',
+          surfaceElevated: 'var(--zippy-surface-elevated)',
+          text: 'var(--zippy-text)',
+          muted: 'var(--zippy-muted)',
+          border: 'var(--zippy-border)',
+          primary: 'var(--zippy-primary)',
+          primaryHover: 'var(--zippy-primary-hover)',
+          primaryText: 'var(--zippy-primary-text)',
+          success: 'var(--zippy-success)',
+          warning: 'var(--zippy-warning)',
+          danger: 'var(--zippy-danger)',
+          ring: 'var(--zippy-ring)'
         }
       },
       fontFamily: {
@@ -31,8 +34,8 @@ const config: Config = {
         xl: '1.25rem'
       },
       boxShadow: {
-        soft: '0 2px 12px rgba(16, 24, 40, 0.06)',
-        modal: '0 16px 32px rgba(16, 24, 40, 0.14)'
+        soft: '0 1px 2px rgba(16, 24, 40, 0.05)',
+        modal: '0 12px 28px rgba(16, 24, 40, 0.14)'
       }
     }
   },
