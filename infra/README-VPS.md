@@ -1,6 +1,32 @@
 # Zippy VPS Deploy (Producción detrás de Cloudflare)
 
-## 1) Preparar variables
+## One-shot install (Ubuntu 22.04 / 24.04)
+
+Desde la raíz del repo:
+
+```bash
+bash infra/scripts/install_vps.sh
+```
+
+El instalador:
+
+- instala Docker Engine + compose plugin si faltan,
+- configura UFW (22/tcp y 80/tcp),
+- crea/completa `infra/.env` en forma idempotente,
+- genera secretos fuertes para Postgres/JWT si faltan,
+- levanta el stack (`infra/docker-compose.vps.yml`),
+- ejecuta Prisma generate + migrate,
+- y corre smoke tests finales.
+
+## Verificación post-instalación
+
+```bash
+bash infra/scripts/verify_vps.sh
+```
+
+## Flujo manual (alternativo)
+
+### 1) Preparar variables
 
 ```bash
 cp infra/.env.example infra/.env
@@ -19,19 +45,19 @@ Pegá esos valores en `infra/.env` para:
 - `JWT_REFRESH_SECRET`
 - `POSTGRES_PASSWORD`
 
-## 2) Levantar stack de producción
+### 2) Levantar stack de producción
 
 ```bash
 docker compose -f infra/docker-compose.vps.yml --env-file infra/.env up -d --build
 ```
 
-## 3) Ejecutar migraciones Prisma
+### 3) Ejecutar migraciones Prisma
 
 ```bash
 docker compose -f infra/docker-compose.vps.yml --env-file infra/.env run --rm migrate
 ```
 
-## 3.1) Verificación de API (desde la raíz del monorepo)
+### 3.1) Verificación de API (desde la raíz del monorepo)
 
 Estos comandos sirven para validar build y Prisma localmente si tenés dependencias instaladas en host:
 

@@ -51,7 +51,9 @@ services:
       dockerfile: infra/docker/api.prod.Dockerfile
     environment:
       DATABASE_URL: ${DATABASE_URL}
-    command: pnpm --filter @zippy/api db:migrate
+    command: >-
+      sh -lc "pnpm --filter @zippy/api prisma:generate &&
+      pnpm --filter @zippy/api db:migrate"
     depends_on:
       postgres:
         condition: service_healthy
