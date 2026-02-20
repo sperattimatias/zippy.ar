@@ -12,13 +12,13 @@ export const tokens = {
     danger: 'bg-zippy-danger'
   },
   typography: {
-    title: 'text-2xl md:text-3xl font-semibold tracking-tight',
-    subtitle: 'text-sm text-zippy-muted',
+    title: 'text-3xl md:text-4xl font-semibold tracking-tight',
+    subtitle: 'text-base text-zippy-muted',
     body: 'text-sm text-zippy-text',
     label: 'text-sm font-medium text-zippy-text'
   },
   spacing: {
-    section: 'p-6 md:p-8',
+    section: 'p-6 md:p-10',
     stack: 'space-y-4',
     compact: 'space-y-2'
   },

@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PASSENGER
+  DRIVER
+  ADMIN
+}
+
+enum RideStatus {
+  DRAFT
+  SEARCHING
+  ASSIGNED
+  DRIVER_EN_ROUTE
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  // legacy statuses kept for backward compatibility
+  REQUESTED
+  NEGOTIATING
+  ARRIVED
+  EXPIRED
+}
+
+enum DriverVerificationStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  BANNED
+}
+
+enum VehicleType {
+  AUTO
+  MOTO
+}
+
+enum RideType {
+  DIRECT
+  SHARED
+}
+
+enum OfferStatus {
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  passwordHash     String
+  role             Role     @default(PASSENGER)
+  firstName        String
+  lastName         String
+  phone            String?
+  avatarUrl        String?
+  refreshTokenHash String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  ridesAsPassenger Ride[]          @relation("RidePassenger")
+  ridesAsDriver    Ride[]          @relation("RideDriver")
+  offers           Offer[]
+  favorites        FavoritePlace[]
+  driverProfile    DriverProfile?
+}
+
+model FavoritePlace {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String
+  address   String
+  placeId   String
+  lat       Float
+  lng       Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model DriverProfile {
+  id              String                   @id @default(cuid())
+  userId          String                   @unique
+  status          DriverVerificationStatus @default(PENDING_VERIFICATION)
+  vehicleType     VehicleType
+  plateNumber     String
+  isOnline        Boolean                  @default(false)
+  lastLocationLat Float?
+  lastLocationLng Float?
+  updatedAt       DateTime                 @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([isOnline])
+}
+
+model Ride {
+  id                 String     @id @default(cuid())
+  passengerId        String
+  driverId           String?
+  status             RideStatus @default(SEARCHING)
+  originAddress      String
+  originPlaceId      String?
+  originLat          Float
+  originLng          Float
+  destinationAddress String
+  destinationPlaceId String?
+  destinationLat     Float
+  destinationLng     Float
+  vehicleType        VehicleType
+  rideType           RideType
+  hasLuggage         Boolean    @default(false)
+  hasPets            Boolean    @default(false)
+  needsAccessibility Boolean    @default(false)
+  note               String?
+  distanceMeters     Int?
+  durationSeconds    Int?
+  estimatedMin       Decimal?   @db.Decimal(10, 2)
+  estimatedMax       Decimal?   @db.Decimal(10, 2)
+  finalPrice         Decimal?   @db.Decimal(10, 2)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  passenger User                @relation("RidePassenger", fields: [passengerId], references: [id])
+  driver    User?               @relation("RideDriver", fields: [driverId], references: [id])
+  offers    Offer[]
+  events    RideEvent[]
+  history   RideStatusHistory[]
+
+  @@index([passengerId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model Offer {
+  id        String      @id @default(cuid())
+  rideId    String
+  driverId  String
+  status    OfferStatus @default(SENT)
+  amount    Decimal?    @db.Decimal(10, 2)
+  message   String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  ride   Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  driver User @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([rideId])
+  @@index([driverId])
+}
+
+model RideStatusHistory {
+  id     String     @id @default(cuid())
+  rideId String
+  status RideStatus
+  at     DateTime   @default(now())
+
+  ride Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
+
+  @@index([rideId])
+  @@index([at])
+}
+
+model RideEvent {
+  id         String     @id @default(cuid())
+  rideId     String
+  eventType  String
+  fromStatus RideStatus?
+  toStatus   RideStatus?
+  payload    Json?
+  createdAt  DateTime   @default(now())
+
+  ride Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
+
+  @@index([rideId])
+  @@index([createdAt])
+}
+
+model AppConfig {
+  id                  Int      @id @default(1)
+  googleMapsWebKey    String?
+  googleMapsServerKey String?
+  enablePlaces        Boolean  @default(true)
+  enableDistanceMatrix Boolean @default(true)
+  enableDirections    Boolean  @default(true)
+  pricing             Json?
+  updatedAt           DateTime @updatedAt
+}

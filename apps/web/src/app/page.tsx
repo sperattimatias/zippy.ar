@@ -1,29 +1,84 @@
-import { Button, Card, Chip, Input, tokens } from '../ui';
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { FormEvent, useState } from 'react';
+import { apiClient, getStoredAuth } from '../lib/api-client';
 
 export default function HomePage() {
+  const router = useRouter();
+  const [origin, setOrigin] = useState({ address: '', placeId: '', lat: -34.6037, lng: -58.3816 });
+  const [destination, setDestination] = useState({ address: '', placeId: '', lat: -34.61, lng: -58.38 });
+  const [vehicleType, setVehicleType] = useState<'AUTO' | 'MOTO'>('AUTO');
+  const [rideType, setRideType] = useState<'DIRECT' | 'SHARED'>('DIRECT');
+  const [hasLuggage, setHasLuggage] = useState(false);
+  const [hasPets, setHasPets] = useState(false);
+  const [needsAccessibility, setNeedsAccessibility] = useState(false);
+  const [note, setNote] = useState('');
+  const [estimate, setEstimate] = useState<{ estimatedMin: number; estimatedMax: number } | null>(null);
+
+  const askEstimate = async () => {
+    if (!origin.address || !destination.address) return;
+    const result = await apiClient.post<{ estimatedMin: number; estimatedMax: number }>('/rides/estimate', {
+      origin,
+      destination,
+      vehicleType,
+      rideType,
+      hasLuggage,
+      hasPets,
+      needsAccessibility
+    });
+    setEstimate(result);
+  };
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    const auth = getStoredAuth();
+    if (!auth) {
+      router.push(`/auth/login?returnUrl=${encodeURIComponent('/')}`);
+      return;
+    }
+
+    const ride = await apiClient.post<{ id: string }>('/rides', {
+      origin,
+      destination,
+      vehicleType,
+      rideType,
+      hasLuggage,
+      hasPets,
+      needsAccessibility,
+      note
+    });
+    router.push(`/rides/${ride.id}`);
+  };
+
   return (
-    <main className="min-h-screen">
-      <header className="mx-auto flex w-full max-w-3xl items-center px-6 pb-4 pt-6 md:px-8 md:pt-8">
-        <span className="text-xl font-semibold tracking-tight text-zippy-text">Zippy</span>
+    <main className="mx-auto max-w-2xl p-6">
+      <header className="mb-6 flex justify-between">
+        <h1 className="text-2xl font-semibold">Passenger Home</h1>
+        <div className="flex gap-3 text-sm">
+          <Link href="/rides">Historial</Link>
+          <Link href="/account">Cuenta</Link>
+        </div>
       </header>
 
-      <section className="mx-auto w-full max-w-3xl px-6 pb-10 md:px-8 md:pb-16">
-        <Card className="space-y-6 p-6 md:p-8">
-          <div className="space-y-2">
-            <Chip variant="neutral">Viajes urbanos</Chip>
-            <h1 className={tokens.typography.title}>Movete por la ciudad, simple y rápido.</h1>
-            <p className={tokens.typography.subtitle}>
-              Elegí origen y destino para pedir tu viaje en pocos toques.
-            </p>
-          </div>
-
-          <form className="space-y-4" aria-label="Formulario para pedir viaje">
-            <Input label="¿De dónde salís?" placeholder="Ej: Palermo, CABA" autoComplete="off" />
-            <Input label="¿A dónde vas?" placeholder="Ej: Microcentro, CABA" autoComplete="off" />
-            <Button type="button">Pedir viaje</Button>
-          </form>
-        </Card>
-      </section>
+      <form className="space-y-3" onSubmit={(e)=>{void submit(e);}}>
+        <input className="w-full rounded border p-2" placeholder="Origen" value={origin.address} onChange={(e)=>setOrigin({...origin,address:e.target.value})} />
+        <input className="w-full rounded border p-2" placeholder="Destino" value={destination.address} onChange={(e)=>setDestination({...destination,address:e.target.value})} />
+        <div className="flex gap-2">
+          <select className="rounded border p-2" value={vehicleType} onChange={(e)=>setVehicleType(e.target.value as 'AUTO'|'MOTO')}><option value="AUTO">Auto</option><option value="MOTO">Moto</option></select>
+          <select className="rounded border p-2" value={rideType} onChange={(e)=>setRideType(e.target.value as 'DIRECT'|'SHARED')}><option value="DIRECT">Directo</option><option value="SHARED">Compartido</option></select>
+        </div>
+        <div className="flex gap-3 text-sm">
+          <label><input type="checkbox" checked={hasLuggage} onChange={(e)=>setHasLuggage(e.target.checked)} /> Equipaje</label>
+          <label><input type="checkbox" checked={hasPets} onChange={(e)=>setHasPets(e.target.checked)} /> Mascota</label>
+          <label><input type="checkbox" checked={needsAccessibility} onChange={(e)=>setNeedsAccessibility(e.target.checked)} /> Accesibilidad</label>
+        </div>
+        <textarea className="w-full rounded border p-2" maxLength={200} placeholder="Nota para el conductor" value={note} onChange={(e)=>setNote(e.target.value)} />
+        <button type="button" className="rounded border px-3 py-2" onClick={() => void askEstimate()}>Calcular estimación</button>
+        {estimate ? <p className="text-sm">Estimado: ARS {estimate.estimatedMin} - {estimate.estimatedMax}</p> : null}
+        <button type="submit" className="w-full rounded bg-black p-2 text-white">Solicitar viaje</button>
+      </form>
     </main>
   );
 }
