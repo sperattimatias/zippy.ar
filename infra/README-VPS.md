@@ -31,6 +31,16 @@ docker compose -f infra/docker-compose.vps.yml --env-file infra/.env up -d --bui
 docker compose -f infra/docker-compose.vps.yml --env-file infra/.env run --rm migrate
 ```
 
+## 3.1) Verificación de API (desde la raíz del monorepo)
+
+Estos comandos sirven para validar build y Prisma localmente si tenés dependencias instaladas en host:
+
+```bash
+pnpm --filter @zippy/api prisma:generate
+pnpm --filter @zippy/api build
+pnpm --filter @zippy/api db:migrate
+```
+
 ## 4) Verificaciones rápidas
 
 ```bash
@@ -47,6 +57,12 @@ docker compose -f infra/docker-compose.vps.yml --env-file infra/.env logs -f api
 curl -i -H 'Host: api.zippy.com.ar' http://127.0.0.1/health
 curl -I -H 'Host: zippy.com.ar' http://127.0.0.1/
 curl -I -H 'Host: admin.zippy.com.ar' http://127.0.0.1/
+```
+
+Smoke test directo a API dentro de la red Docker:
+
+```bash
+docker compose -f infra/docker-compose.vps.yml --env-file infra/.env exec api wget -qO- http://127.0.0.1:4000/health
 ```
 
 ### Health interno de Nginx
