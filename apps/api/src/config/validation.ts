@@ -12,5 +12,8 @@ export const envValidationSchema = Joi.object({
   JWT_ACCESS_SECRET: Joi.string().min(16).required(),
   JWT_REFRESH_SECRET: Joi.string().min(16).required(),
   JWT_ACCESS_EXPIRES_IN_SECONDS: Joi.number().integer().min(60).default(900),
-  JWT_REFRESH_EXPIRES_IN_SECONDS: Joi.number().integer().min(300).default(604800)
+  JWT_REFRESH_EXPIRES_IN_SECONDS: Joi.number().integer().min(300).default(604800),
+  GOOGLE_MAPS_WEB_KEY: Joi.string().allow('').optional(),
+  GOOGLE_MAPS_SERVER_KEY: Joi.string().allow('').optional(),
+  UPLOAD_DIR: Joi.string().default('uploads')
 });
