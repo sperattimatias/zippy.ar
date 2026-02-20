@@ -83,9 +83,10 @@ configure_ufw() {
     as_root apt-get install -y ufw
   fi
 
-  log "Configuring UFW rules (22/tcp and 80/tcp)..."
+  log "Configuring UFW rules (22/tcp, 80/tcp and 443/tcp)..."
   as_root ufw allow 22/tcp >/dev/null
   as_root ufw allow 80/tcp >/dev/null
+  as_root ufw allow 443/tcp >/dev/null
   as_root ufw --force enable >/dev/null || true
 }
 
@@ -135,9 +136,20 @@ prepare_env_values() {
   ensure_env_var "JWT_ACCESS_SECRET" "$(random_hex 32)"
   ensure_env_var "JWT_REFRESH_SECRET" "$(random_hex 32)"
 
-  upsert_env_var "WEB_ORIGIN" "https://zippy.com.ar"
-  upsert_env_var "ADMIN_ORIGIN" "https://admin.zippy.com.ar"
-  upsert_env_var "NEXT_PUBLIC_API_URL" "https://api.zippy.com.ar"
+  # Domain configuration (only used as defaults when corresponding vars are missing):
+  # - BASE_DOMAIN: base DNS zone for deployment (default: zippy.ar)
+  # - WEB_DOMAIN: public passenger web domain (default: BASE_DOMAIN)
+  # - ADMIN_DOMAIN: admin panel domain (default: admin.BASE_DOMAIN)
+  # - API_DOMAIN: API public domain (default: api.BASE_DOMAIN)
+  local base_domain web_domain admin_domain api_domain
+  base_domain="${BASE_DOMAIN:-zippy.ar}"
+  web_domain="${WEB_DOMAIN:-${base_domain}}"
+  admin_domain="${ADMIN_DOMAIN:-admin.${base_domain}}"
+  api_domain="${API_DOMAIN:-api.${base_domain}}"
+
+  ensure_env_var "WEB_ORIGIN" "https://${web_domain}"
+  ensure_env_var "ADMIN_ORIGIN" "https://${admin_domain}"
+  ensure_env_var "NEXT_PUBLIC_API_URL" "https://${api_domain}"
 
   local db_user db_pass db_name
   db_user="$(grep -E '^POSTGRES_USER=' "${ENV_FILE}" | tail -n1 | cut -d'=' -f2-)"
@@ -176,17 +188,23 @@ smoke_test() {
   log "Waiting for nginx to be ready..."
   sleep 5
 
-  docker compose -f "${COMPOSE_FILE}" --env-file "${ENV_FILE}" exec -T nginx sh -lc "wget -qO- http://127.0.0.1/nginx-health >/dev/null" \
-    || fail "Nginx container health endpoint failed (/nginx-health)."
+  docker compose -f "${COMPOSE_FILE}" --env-file "${ENV_FILE}" exec -T nginx sh -lc "wget -qO- http://127.0.0.1/nginx-health >/dev/null"     || fail "Nginx container health endpoint failed (/nginx-health)."
 
-  curl -fsS -H "Host: zippy.com.ar" http://127.0.0.1/nginx-health >/dev/null \
-    || fail "Host-routed nginx health failed for zippy.com.ar"
+  local web_origin api_origin web_host api_host
+  web_origin="$(grep -E '^WEB_ORIGIN=' "${ENV_FILE}" | tail -n1 | cut -d'=' -f2-)"
+  api_origin="$(grep -E '^NEXT_PUBLIC_API_URL=' "${ENV_FILE}" | tail -n1 | cut -d'=' -f2-)"
+  web_host="${web_origin#https://}"
+  web_host="${web_host#http://}"
+  api_host="${api_origin#https://}"
+  api_host="${api_host#http://}"
 
-  curl -fsS -H "Host: api.zippy.com.ar" http://127.0.0.1/health >/dev/null \
-    || fail "API health failed via nginx host routing (api.zippy.com.ar -> /health)."
+  curl -fsS -H "Host: ${web_host}" http://127.0.0.1/nginx-health >/dev/null     || fail "Host-routed nginx health failed for ${web_host}"
+
+  curl -fsS -H "Host: ${api_host}" http://127.0.0.1/health >/dev/null     || fail "API health failed via nginx host routing (${api_host} -> /health)."
 
   log "Smoke tests passed (nginx + api health)."
 }
+
 
 main() {
   assert_linux_ubuntu
