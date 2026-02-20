@@ -9,10 +9,7 @@ const splitOrigins = (value: string | undefined): string[] =>
     : [];
 
 export const envConfig = registerAs('env', () => {
-  const directOrigins = [process.env.WEB_ORIGIN, process.env.ADMIN_ORIGIN].filter(
-    (value): value is string => Boolean(value)
-  );
-
+  const directOrigins = [process.env.WEB_ORIGIN, process.env.ADMIN_ORIGIN].filter((value): value is string => Boolean(value));
   const csvOrigins = splitOrigins(process.env.CORS_ALLOWED_ORIGINS);
 
   return {
@@ -25,6 +22,9 @@ export const envConfig = registerAs('env', () => {
     jwtAccessSecret: process.env.JWT_ACCESS_SECRET ?? 'dev-access-secret',
     jwtRefreshSecret: process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret',
     jwtAccessExpiresInSeconds: Number(process.env.JWT_ACCESS_EXPIRES_IN_SECONDS ?? 900),
-    jwtRefreshExpiresInSeconds: Number(process.env.JWT_REFRESH_EXPIRES_IN_SECONDS ?? 604800)
+    jwtRefreshExpiresInSeconds: Number(process.env.JWT_REFRESH_EXPIRES_IN_SECONDS ?? 604800),
+    googleMapsWebKey: process.env.GOOGLE_MAPS_WEB_KEY ?? '',
+    googleMapsServerKey: process.env.GOOGLE_MAPS_SERVER_KEY ?? '',
+    uploadDir: process.env.UPLOAD_DIR ?? 'uploads'
   };
 });

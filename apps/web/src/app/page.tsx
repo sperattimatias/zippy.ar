@@ -2,78 +2,91 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { ArrowRight, CalendarClock, MapPin, Navigation, UserCircle } from 'lucide-react';
+import { apiClient, getStoredAuth } from '../lib/api-client';
 import { Button, Card, Chip, Input, Toggle } from '../ui';
 
-type RideMode = 'Auto' | 'Moto';
-type RideType = 'Compartido' | 'Directo';
+type Vehicle = 'AUTO' | 'MOTO';
+type RideKind = 'DIRECT' | 'SHARED';
 
 export default function HomePage() {
   const router = useRouter();
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
-  const [rideMode, setRideMode] = useState<RideMode>('Auto');
-  const [rideType, setRideType] = useState<RideType>('Directo');
-  const [hasLuggage, setHasLuggage] = useState(false);
-  const [hasPets, setHasPets] = useState(false);
-  const [needsAccessibility, setNeedsAccessibility] = useState(false);
-  const [note, setNote] = useState('');
-  const [destinationError, setDestinationError] = useState('');
+  const [form, setForm] = useState({
+    originAddress: 'Tu ubicación',
+    originPlaceId: 'gps',
+    originLat: -34.6037,
+    originLng: -58.3816,
+    destinationAddress: '',
+    destinationPlaceId: '',
+    destinationLat: 0,
+    destinationLng: 0,
+    vehicleType: 'AUTO' as Vehicle,
+    rideType: 'DIRECT' as RideKind,
+    luggage: false,
+    pet: false,
+    accessibility: false,
+    note: ''
+  });
+  const [estimate, setEstimate] = useState<{ estimatedMin: number; estimatedMax: number } | null>(null);
+  const [error, setError] = useState('');
+  const [loadingEstimate, setLoadingEstimate] = useState(false);
+  const [loadingRequest, setLoadingRequest] = useState(false);
 
-  const estimatedRange = useMemo(() => {
-    const base = rideMode === 'Moto' ? 3200 : 4500;
-    const typeDelta = rideType === 'Directo' ? 900 : 0;
-    const extras = Number(hasLuggage) * 250 + Number(hasPets) * 300 + Number(needsAccessibility) * 350;
-    const min = base + typeDelta + extras;
-    const max = min + 1500;
-    return { min, max };
-  }, [hasLuggage, hasPets, needsAccessibility, rideMode, rideType]);
+  useEffect(() => {
+    navigator.geolocation?.getCurrentPosition((pos) => {
+      setForm((prev) => ({ ...prev, originLat: pos.coords.latitude, originLng: pos.coords.longitude }));
+    });
+  }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!destination.trim()) {
-      setDestinationError('Ingresá un destino para continuar.');
+  const estimateRide = async () => {
+    if (!form.destinationAddress.trim()) {
+      setError('Ingresá un destino para estimar.');
       return;
     }
 
-    setDestinationError('');
+    setLoadingEstimate(true);
+    setError('');
+    try {
+      const data = await apiClient.post<{ estimatedMin: number; estimatedMax: number }>('/rides/estimate', form);
+      setEstimate(data);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoadingEstimate(false);
+    }
+  };
 
-    const query = new URLSearchParams({
-      origin: origin.trim() || 'Tu ubicación',
-      destination: destination.trim(),
-      mode: rideMode,
-      type: rideType,
-      hasLuggage: String(hasLuggage),
-      hasPets: String(hasPets),
-      needsAccessibility: String(needsAccessibility),
-      note: note.trim()
-    });
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!getStoredAuth()) {
+      router.push(`/auth/login?returnUrl=${encodeURIComponent('/')}`);
+      return;
+    }
 
-    router.push(`/offers?${query.toString()}`);
+    setLoadingRequest(true);
+    setError('');
+    try {
+      const ride = await apiClient.post<{ id: string }>('/rides', form);
+      router.push(`/rides/${ride.id}`);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoadingRequest(false);
+    }
   };
 
   return (
     <main className="min-h-screen bg-zippy-bg">
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 pb-5 pt-6 sm:px-6">
         <span className="text-xl font-semibold tracking-tight text-zippy-text">Zippy</span>
-
         <div className="flex items-center gap-2">
-          <Link
-            href="/offers?history=true"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-zippy-border bg-zippy-surface px-3 text-sm font-medium text-zippy-text transition hover:bg-zippy-surfaceElevated"
-          >
-            <CalendarClock className="size-4" />
-            Historial
+          <Link href="/rides" className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-zippy-border bg-zippy-surface px-3 text-sm font-medium text-zippy-text">
+            <CalendarClock className="size-4" /> Historial
           </Link>
-          <button
-            type="button"
-            aria-label="Perfil"
-            className="inline-flex size-10 items-center justify-center rounded-xl border border-zippy-border bg-zippy-surface text-zippy-muted transition hover:text-zippy-text"
-          >
+          <Link href="/account" className="inline-flex size-10 items-center justify-center rounded-xl border border-zippy-border bg-zippy-surface text-zippy-muted">
             <UserCircle className="size-5" />
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -81,106 +94,45 @@ export default function HomePage() {
         <Card className="space-y-6 rounded-3xl p-5 sm:p-7">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zippy-muted">Passenger Home</p>
-            <h1 className="text-2xl font-semibold leading-tight tracking-tight text-zippy-text sm:text-3xl">
-              ¿A dónde te llevamos hoy?
-            </h1>
-            <p className="text-sm text-zippy-muted">Configurá tu viaje y recibí ofertas en segundos.</p>
+            <h1 className="text-2xl font-semibold leading-tight tracking-tight text-zippy-text sm:text-3xl">¿A dónde te llevamos hoy?</h1>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-            <div className="space-y-4">
-              <Input
-                label="Origen"
-                placeholder="Tu ubicación"
-                leftIcon={<MapPin className="size-4" />}
-                value={origin}
-                onChange={(event) => setOrigin(event.target.value)}
-              />
-              <div className="space-y-2">
-                <Input
-                  label="Destino"
-                  placeholder="¿A dónde vas?"
-                  leftIcon={<Navigation className="size-4" />}
-                  value={destination}
-                  onChange={(event) => {
-                    setDestination(event.target.value);
-                    if (destinationError) {
-                      setDestinationError('');
-                    }
-                  }}
-                  aria-invalid={Boolean(destinationError)}
-                />
-                {destinationError ? <p className="text-sm text-rose-600">{destinationError}</p> : null}
-              </div>
-            </div>
+            <Input label="Origen" placeholder="Tu ubicación" leftIcon={<MapPin className="size-4" />} value={form.originAddress} onChange={(e) => setForm((p) => ({ ...p, originAddress: e.target.value, originPlaceId: e.target.value }))} />
+            <Input label="Destino" placeholder="¿A dónde vas?" leftIcon={<Navigation className="size-4" />} value={form.destinationAddress} onChange={(e) => setForm((p) => ({ ...p, destinationAddress: e.target.value, destinationPlaceId: e.target.value, destinationLat: -34.6, destinationLng: -58.4 }))} />
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <p className="text-sm font-medium text-zippy-text">Vehículo</p>
-                <div className="flex flex-wrap gap-2">
-                  {(['Auto', 'Moto'] as const).map((mode) => (
-                    <Chip key={mode} selected={rideMode === mode} onClick={() => setRideMode(mode)}>
-                      {mode}
-                    </Chip>
-                  ))}
-                </div>
+                <div className="flex gap-2">{(['AUTO', 'MOTO'] as const).map((mode) => <Chip key={mode} selected={form.vehicleType === mode} onClick={() => setForm((p) => ({ ...p, vehicleType: mode }))}>{mode === 'AUTO' ? 'Auto' : 'Moto'}</Chip>)}</div>
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-medium text-zippy-text">Tipo de viaje</p>
-                <div className="flex flex-wrap gap-2">
-                  {(['Compartido', 'Directo'] as const).map((type) => (
-                    <Chip key={type} selected={rideType === type} onClick={() => setRideType(type)}>
-                      {type}
-                    </Chip>
-                  ))}
-                </div>
+                <div className="flex gap-2">{(['DIRECT', 'SHARED'] as const).map((type) => <Chip key={type} selected={form.rideType === type} onClick={() => setForm((p) => ({ ...p, rideType: type }))}>{type === 'DIRECT' ? 'Directo' : 'Compartido'}</Chip>)}</div>
               </div>
             </div>
 
             <div className="space-y-3 rounded-2xl border border-zippy-border bg-zippy-surfaceElevated/50 p-4">
               <p className="text-sm font-medium text-zippy-text">Condiciones especiales</p>
               <div className="grid gap-3 sm:grid-cols-3">
-                <label className="flex items-center justify-between rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2">
-                  <span className="text-sm text-zippy-text">Equipaje</span>
-                  <Toggle checked={hasLuggage} onClick={() => setHasLuggage((value) => !value)} />
-                </label>
-                <label className="flex items-center justify-between rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2">
-                  <span className="text-sm text-zippy-text">Mascota</span>
-                  <Toggle checked={hasPets} onClick={() => setHasPets((value) => !value)} />
-                </label>
-                <label className="flex items-center justify-between rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2">
-                  <span className="text-sm text-zippy-text">Accesibilidad</span>
-                  <Toggle checked={needsAccessibility} onClick={() => setNeedsAccessibility((value) => !value)} />
-                </label>
+                <label className="flex items-center justify-between rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2"><span className="text-sm">Equipaje</span><Toggle checked={form.luggage} onClick={() => setForm((p) => ({ ...p, luggage: !p.luggage }))} /></label>
+                <label className="flex items-center justify-between rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2"><span className="text-sm">Mascota</span><Toggle checked={form.pet} onClick={() => setForm((p) => ({ ...p, pet: !p.pet }))} /></label>
+                <label className="flex items-center justify-between rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2"><span className="text-sm">Accesibilidad</span><Toggle checked={form.accessibility} onClick={() => setForm((p) => ({ ...p, accessibility: !p.accessibility }))} /></label>
               </div>
             </div>
 
-            <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-zippy-text">Nota para el conductor (opcional)</span>
-              <textarea
-                rows={3}
-                placeholder="Ej: Estoy en la puerta del edificio, timbre 4B."
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                className="w-full resize-none rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2.5 text-sm text-zippy-text placeholder:text-zippy-muted outline-none transition focus:border-zippy-primary focus:ring-2 focus:ring-zippy-ring"
-              />
-            </label>
+            <label className="flex flex-col gap-2"><span className="text-sm font-medium text-zippy-text">Nota para el conductor (opcional)</span><textarea rows={3} maxLength={200} value={form.note} onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))} className="w-full resize-none rounded-xl border border-zippy-border bg-zippy-surface px-3 py-2.5 text-sm text-zippy-text" /></label>
 
             <Card className="space-y-1 rounded-2xl border-zippy-border bg-zippy-surfaceElevated p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zippy-muted">Estimado del viaje</p>
-              <p className="text-2xl font-semibold tracking-tight text-zippy-text">
-                ARS ${estimatedRange.min.toLocaleString('es-AR')} - ${estimatedRange.max.toLocaleString('es-AR')}
-              </p>
-              <p className="text-sm text-zippy-muted">El valor final puede variar según tráfico y oferta del conductor.</p>
+              {estimate ? <p className="text-2xl font-semibold tracking-tight text-zippy-text">ARS ${estimate.estimatedMin.toLocaleString('es-AR')} - ${estimate.estimatedMax.toLocaleString('es-AR')}</p> : <p className="text-sm text-zippy-muted">Calculá una estimación para ver el rango.</p>}
             </Card>
 
+            {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+
             <div className="space-y-3">
-              <Button type="submit" leadingIcon={<ArrowRight className="size-4" />} className="w-full">
-                Solicitar viaje
-              </Button>
-              <Link href="/offers?history=true" className="block text-center text-sm font-medium text-zippy-muted hover:text-zippy-text">
-                Ver historial
-              </Link>
+              <Button type="button" variant="secondary" onClick={estimateRide} loading={loadingEstimate} className="w-full">Calcular estimación</Button>
+              <Button type="submit" leadingIcon={<ArrowRight className="size-4" />} loading={loadingRequest} className="w-full">Solicitar viaje</Button>
             </div>
           </form>
         </Card>

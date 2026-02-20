@@ -13,65 +13,143 @@ enum Role {
   ADMIN
 }
 
+enum DriverStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  BANNED
+}
+
+enum VehicleType {
+  AUTO
+  MOTO
+}
+
+enum RideType {
+  DIRECT
+  SHARED
+}
+
 enum RideStatus {
-  REQUESTED
-  NEGOTIATING
+  DRAFT
+  SEARCHING
   ASSIGNED
   DRIVER_EN_ROUTE
-  ARRIVED
   IN_PROGRESS
   COMPLETED
   CANCELLED
+}
+
+enum OfferStatus {
+  SENT
+  ACCEPTED
+  REJECTED
   EXPIRED
 }
 
 model User {
   id               String   @id @default(cuid())
+  role             Role     @default(PASSENGER)
   email            String   @unique
   passwordHash     String
-  role             Role     @default(PASSENGER)
   refreshTokenHash String?
+  firstName        String
+  lastName         String
+  phone            String?
+  avatarUrl        String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  ridesAsPassenger Ride[] @relation("RidePassenger")
-  ridesAsDriver    Ride[] @relation("RideDriver")
+  favorites        FavoritePlace[]
+  driverProfile    DriverProfile?
+  ridesAsPassenger Ride[]          @relation("RidePassenger")
+  ridesAsDriver    Ride[]          @relation("RideDriver")
   offers           Offer[]
+}
+
+model FavoritePlace {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String
+  address   String
+  placeId   String
+  lat       Float
+  lng       Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model DriverProfile {
+  id              String       @id @default(cuid())
+  userId          String       @unique
+  status          DriverStatus @default(PENDING_VERIFICATION)
+  vehicleType     VehicleType
+  plateNumber     String
+  isOnline        Boolean      @default(false)
+  lastLocationLat Float?
+  lastLocationLng Float?
+  updatedAt       DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Ride {
   id                 String     @id @default(cuid())
-  passengerId        String?
+  passengerId        String
   driverId           String?
-  status             RideStatus @default(REQUESTED)
-  estimatedFare      Decimal    @db.Decimal(10, 2)
-  agreedFare         Decimal?   @db.Decimal(10, 2)
-  hasLuggage         Boolean    @default(false)
-  hasPets            Boolean    @default(false)
-  needsAccessibility Boolean    @default(false)
+  originAddress      String
+  originPlaceId      String
+  originLat          Float
+  originLng          Float
+  destinationAddress String
+  destinationPlaceId String
+  destinationLat     Float
+  destinationLng     Float
+  vehicleType        VehicleType
+  rideType           RideType
+  luggage            Boolean    @default(false)
+  pet                Boolean    @default(false)
+  accessibility      Boolean    @default(false)
   note               String?
+  distanceMeters     Int
+  durationSeconds    Int
+  estimatedMin       Decimal    @db.Decimal(10, 2)
+  estimatedMax       Decimal    @db.Decimal(10, 2)
+  finalPrice         Decimal?   @db.Decimal(10, 2)
+  status             RideStatus @default(DRAFT)
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
 
-  passenger User?      @relation("RidePassenger", fields: [passengerId], references: [id])
-  driver    User?      @relation("RideDriver", fields: [driverId], references: [id])
+  passenger User                @relation("RidePassenger", fields: [passengerId], references: [id])
+  driver    User?               @relation("RideDriver", fields: [driverId], references: [id])
+  history   RideStatusHistory[]
   offers    Offer[]
-  events    RideEvent[]
 
   @@index([passengerId])
   @@index([driverId])
   @@index([status])
 }
 
+model RideStatusHistory {
+  id     String     @id @default(cuid())
+  rideId String
+  status RideStatus
+  at     DateTime   @default(now())
+
+  ride Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
+
+  @@index([rideId])
+}
+
 model Offer {
-  id         String   @id @default(cuid())
-  rideId     String
-  driverId   String
-  amount     Decimal  @db.Decimal(10, 2)
-  message    String?
-  isAccepted Boolean  @default(false)
-  acceptedAt DateTime?
-  createdAt  DateTime @default(now())
+  id        String      @id @default(cuid())
+  rideId    String
+  driverId  String
+  status    OfferStatus @default(SENT)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   ride   Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
   driver User @relation(fields: [driverId], references: [id], onDelete: Cascade)
@@ -80,17 +158,13 @@ model Offer {
   @@index([driverId])
 }
 
-model RideEvent {
-  id         String     @id @default(cuid())
-  rideId     String
-  eventType  String
-  fromStatus RideStatus?
-  toStatus   RideStatus?
-  payload    Json?
-  createdAt  DateTime   @default(now())
-
-  ride Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
-
-  @@index([rideId])
-  @@index([createdAt])
+model AppConfig {
+  id                   String   @id @default("singleton")
+  googleMapsWebKey     String?
+  googleMapsServerKey  String?
+  enablePlaces         Boolean  @default(true)
+  enableDistanceMatrix Boolean  @default(true)
+  enableDirections     Boolean  @default(false)
+  pricing              Json
+  updatedAt            DateTime @updatedAt
 }
